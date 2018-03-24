@@ -25,7 +25,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import beliveapp.io.MainActivity;
 import beliveapp.io.R;
-import beliveapp.io.features.chat.ChatActivity;
 
 public class LoginActivity extends BaseActivity {
 
@@ -115,7 +114,7 @@ public class LoginActivity extends BaseActivity {
     private void updateUI(FirebaseUser user) {
         hideProgressDialog();
         if (user != null) {
-            Intent intent = new Intent(LoginActivity.this, ChatActivity.class);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             LoginActivity.this.startActivity(intent);
             this.finish();
         } else {

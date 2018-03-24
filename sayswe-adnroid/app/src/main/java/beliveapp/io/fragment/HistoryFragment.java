@@ -1,6 +1,5 @@
 package beliveapp.io.fragment;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,10 +20,15 @@ import com.stfalcon.chatkit.utils.DateFormatter;
 import java.util.Date;
 
 import beliveapp.io.R;
-import beliveapp.io.chat.model.DefaultDialog;
+import beliveapp.io.common.data.fixtures.DialogsFixtures;
+import beliveapp.io.common.data.model.Message;
+import beliveapp.io.features.def.DefaultMessagesActivity;
 import beliveapp.io.listener.OnFragmentInteractionListener;
+import beliveapp.io.utils.AppUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import beliveapp.io.common.data.model.Dialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,7 +38,8 @@ import butterknife.ButterKnife;
  * Use the {@link HistoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements DialogsListAdapter.OnDialogClickListener<Dialog>,
+        DialogsListAdapter.OnDialogLongClickListener<Dialog> {
 
     @BindView(R.id.dialogsList)
     DialogsList dialogsList;
@@ -50,14 +55,8 @@ public class HistoryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private DialogsListAdapter dialogsListAdapter = new DialogsListAdapter<>(R.id.dialogsList, new ImageLoader() {
-        @Override
-        public void loadImage(ImageView imageView, String url) {
-            //If you using another library - write here your way to load image
-            Picasso.get().load(url).into(imageView);
-        }
-    });
-
+    private ImageLoader imageLoader;
+    private DialogsListAdapter<Dialog> dialogsAdapter;
 
     public HistoryFragment() {
         // Required empty public constructor
@@ -98,23 +97,7 @@ public class HistoryFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        dialogsList.setAdapter(dialogsListAdapter);
-
-        dialogsListAdapter.setOnDialogClickListener(new DialogsListAdapter.OnDialogClickListener<DefaultDialog>() {
-            @Override
-            public void onDialogClick(DefaultDialog dialog) {
-                //On item click action
-            }
-        });
-
-        dialogsListAdapter.setOnDialogLongClickListener(new DialogsListAdapter.OnDialogLongClickListener<DefaultDialog>() {
-            @Override
-            public void onDialogLongClick(DefaultDialog dialog) {
-                //on long item click action
-            }
-        });
-
-//        dialogsListAdapter.addItem();
+        initAdapter();
 
         return view;
     }
@@ -144,9 +127,52 @@ public class HistoryFragment extends Fragment {
     }
 
     private void onNewMessage(String dialogId, IMessage message) {
-        if (!dialogsListAdapter.updateDialogWithMessage(dialogId, message)) {
+        if (!dialogsAdapter.updateDialogWithMessage(dialogId, message)) {
             //Dialog with this ID doesn't exist, so you can create new Dialog or reload all dialogs list
         }
     }
 
+    private void initAdapter() {
+
+        imageLoader = new ImageLoader() {
+            @Override
+            public void loadImage(ImageView imageView, String url) {
+                Picasso.get().load(url).into(imageView);
+            }
+        };
+
+        dialogsAdapter = new DialogsListAdapter<>(imageLoader);
+        dialogsAdapter.setItems(DialogsFixtures.getDialogs());
+
+        dialogsAdapter.setOnDialogClickListener(this);
+        dialogsAdapter.setOnDialogLongClickListener(this);
+
+        dialogsList.setAdapter(dialogsAdapter);
+    }
+
+    //for example
+    private void onNewMessage(String dialogId, Message message) {
+        boolean isUpdated = dialogsAdapter.updateDialogWithMessage(dialogId, message);
+        if (!isUpdated) {
+            //Dialog with this ID doesn't exist, so you can create new Dialog or update all dialogs list
+        }
+    }
+
+    //for example
+    private void onNewDialog(Dialog dialog) {
+        dialogsAdapter.addItem(dialog);
+    }
+
+    @Override
+    public void onDialogLongClick(Dialog dialog) {
+        AppUtils.showToast(
+                getActivity(),
+                dialog.getDialogName(),
+                false);
+    }
+
+    @Override
+    public void onDialogClick(Dialog dialog) {
+        DefaultMessagesActivity.open(getActivity());
+    }
 }

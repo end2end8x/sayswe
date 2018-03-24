@@ -17,7 +17,7 @@ import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import beliveapp.io.MainActivity;
 import beliveapp.io.R;
-import beliveapp.io.chat.model.Message;
+import beliveapp.io.common.data.model.Message;
 import beliveapp.io.listener.OnFragmentInteractionListener;
 import butterknife.BindView;
 import butterknife.ButterKnife;
