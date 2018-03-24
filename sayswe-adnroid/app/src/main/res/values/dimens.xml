@@ -12,4 +12,7 @@
     <dimen name="icon_bottom_margin">24dp</dimen>
     <dimen name="title_bottom_margin">16dp</dimen>
     <dimen name="field_width_standard">160dp</dimen>
+
+    <dimen name="activity_margin">16dp</dimen>
+    <dimen name="card_padding">40dp</dimen>
 </resources>

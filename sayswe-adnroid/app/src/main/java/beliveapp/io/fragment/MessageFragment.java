@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.dialogs.DialogsList;
+import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import beliveapp.io.MainActivity;
@@ -32,7 +33,7 @@ import butterknife.ButterKnife;
 public class MessageFragment extends Fragment {
 
     @BindView(R.id.messagesList)
-    DialogsList messagesList;
+    MessagesList messagesList;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
