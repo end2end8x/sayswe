@@ -2,7 +2,6 @@ package beliveapp.io;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -11,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,16 +19,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import beliveapp.io.fragment.ContactFragment;
+import beliveapp.io.fragment.HistoryFragment;
+import beliveapp.io.fragment.MessageFragment;
+import beliveapp.io.listener.OnFragmentInteractionListener;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentInteractionListener {
 
     private FirebaseAuth mAuth;
 
@@ -69,6 +70,11 @@ public class MainActivity extends AppCompatActivity
         tbl_pages.setupWithViewPager(vp_pages);
 
         mAuth = FirebaseAuth.getInstance();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue("Hello, World!");
     }
 
     @Override
@@ -128,6 +134,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
     class FragmentAdapter extends FragmentPagerAdapter {
 
         public FragmentAdapter(FragmentManager fm) {
@@ -138,11 +149,11 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    return new Fragment();
+                    return new MessageFragment();
                 case 1:
-                    return new Fragment();
+                    return new HistoryFragment();
                 case 2:
-                    return new Fragment();
+                    return new ContactFragment();
                 case 3:
                     return new Fragment();
             }
@@ -162,8 +173,8 @@ public class MainActivity extends AppCompatActivity
                 //Your tab titles
                 //
                 case 0: return "Message";
-                case 1: return "Contact";
-                case 2: return "History";
+                case 1: return "History";
+                case 2: return "Contact";
                 case 3: return "Profile";
 
                 default: return null;
@@ -197,27 +208,11 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    void createUser(String email, String password) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "createUserWithEmail:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        updateUI(user);
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                        Toast.makeText(MainActivity.this, "Authentication failed.",
-                                Toast.LENGTH_SHORT).show();
-                        updateUI(null);
-                    }
-
-                    // ...
-                }
-            });
+    public String getUid() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            return  currentUser.getUid();
+        } else return null;
     }
 
 }

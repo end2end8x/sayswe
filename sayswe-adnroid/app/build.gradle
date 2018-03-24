@@ -1,6 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    signingConfigs {
+        debug {
+            keyAlias 'beliveapp'
+            keyPassword '123456a@A'
+            storeFile file('../../Publish/release.jks')
+            storePassword '123456a@A'
+        }
+        release {
+            keyAlias 'beliveapp'
+            keyPassword '123456a@A'
+            storeFile file('../../Publish/release.jks')
+            storePassword '123456a@A'
+        }
+    }
+
     compileSdkVersion 26
     defaultConfig {
         applicationId "beliveapp.io"
@@ -24,10 +40,20 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.google.firebase:firebase-auth:11.0.4'
+    implementation 'com.google.firebase:firebase-database:11.0.4'
+    implementation 'com.google.firebase:firebase-messaging:11.0.4'
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.google.android.gms:play-services-plus:11.0.4'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-}
 
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile 'com.github.stfalcon:chatkit:0.2.2'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+}
 
 apply plugin: 'com.google.gms.google-services'
