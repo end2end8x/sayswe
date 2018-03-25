@@ -29,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import beliveapp.io.fragment.ContactFragment;
 import beliveapp.io.fragment.HistoryFragment;
 import beliveapp.io.fragment.MessageFragment;
+import beliveapp.io.fragment.ProfileFragment;
 import beliveapp.io.listener.OnFragmentInteractionListener;
 
 public class MainActivity extends AppCompatActivity
@@ -154,20 +155,18 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    return new MessageFragment();
-                case 1:
                     return new HistoryFragment();
-                case 2:
+                case 1:
                     return new ContactFragment();
-                case 3:
-                    return new Fragment();
+                case 2:
+                    return new ProfileFragment();
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
 
 
@@ -178,9 +177,8 @@ public class MainActivity extends AppCompatActivity
                 //Your tab titles
                 //
                 case 0: return "Message";
-                case 1: return "History";
-                case 2: return "Contact";
-                case 3: return "Profile";
+                case 1: return "Contact";
+                case 2: return "Setting";
 
                 default: return null;
             }
@@ -211,6 +209,13 @@ public class MainActivity extends AppCompatActivity
             String uid = user.getUid();
         }
 
+    }
+
+    public FirebaseUser getUser() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            return  currentUser;
+        } else return null;
     }
 
     public String getUid() {

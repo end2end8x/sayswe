@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.common.api.Response;
+
 import beliveapp.io.R;
 import beliveapp.io.listener.OnFragmentInteractionListener;
 
@@ -91,6 +93,29 @@ public class ContactFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+
+    private void readContact() {
+        AccessToken token = AccessToken.getCurrentAccessToken();
+        GraphRequest graphRequest = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
+                try {
+                    JSONArray jsonArrayFriends = jsonObject.getJSONObject("friendlist").getJSONArray("data");
+                    JSONObject friendlistObject = jsonArrayFriends.getJSONObject(0);
+                    String friendListID = friendlistObject.getString("id");
+                    myNewGraphReq(friendListID);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        Bundle param = new Bundle();
+        param.putString("fields", "friendlist", "members");
+        graphRequest.setParameters(param);
+        graphRequest.executeAsync();
     }
 
 }

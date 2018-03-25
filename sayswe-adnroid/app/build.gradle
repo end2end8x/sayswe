@@ -65,9 +65,8 @@ dependencies {
     //ImageViews
 //    compile "de.hdodenhof:circleimageview:$circleImageViewVersion"
 //    compile "com.github.siyamed:android-shape-imageview:$shapeImageViewVersion"
-
     //Utils
-    compile "me.relex:circleindicator:$circleindicatorVersion"
+//    compile "me.relex:circleindicator:$circleindicatorVersion"
 
 }
 
