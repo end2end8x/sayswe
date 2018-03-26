@@ -4,6 +4,7 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     android:orientation="vertical">
 
     <com.facebook.login.widget.LoginButton
@@ -14,5 +15,18 @@
         android:layout_centerVertical="true"
         android:layout_gravity="center_horizontal"
         android:gravity="center" />
+
+    <Button
+        android:id="@+id/smsLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/button_facebook_login"
+        android:layout_alignLeft="@+id/button_facebook_login"
+        android:layout_alignRight="@+id/button_facebook_login"
+        android:layout_alignStart="@+id/button_facebook_login"
+        android:layout_below="@+id/button_facebook_login"
+        android:layout_marginTop="30dp"
+        android:background="@color/colorAccent"
+        android:text="Login SMS" />
 
 </RelativeLayout>

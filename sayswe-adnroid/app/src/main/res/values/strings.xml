@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Says We</string>
+    <string name="app_name">SaysWe</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -23,6 +23,7 @@
     <!-- Strings related to Facebook Config -->
     <string name="facebook_app_id">331265577323837</string>
     <string name="fb_login_protocol_scheme">fb331265577323837</string>
+    <string name="ACCOUNT_KIT_CLIENT_TOKEN">7511327bc6c405f3886fc9e0ecd9ef0f</string>
 
 
     <!-- Strings related to Firebase Auth -->
@@ -126,6 +127,9 @@
     <string name="sample_title">Message</string>
     <string name="sample_title_default">Default view</string>
     <string name="sample_subtitle_default">Dialogs and messages with default style</string>
+
+    <string name="log_out">Log Out</string>
+    <string name="title_activity_login_email">Sign in</string>
 
 
 </resources>

@@ -1,8 +1,11 @@
 package beliveapp.io.fragment;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Contacts;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,7 +106,6 @@ public class ContactFragment extends Fragment {
         mListener = null;
     }
 
-
     private void readContact() {
         AccessToken token = AccessToken.getCurrentAccessToken();
         GraphRequest graphRequest = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
@@ -121,7 +123,7 @@ public class ContactFragment extends Fragment {
             }
         });
         Bundle param = new Bundle();
-        param.putString("fields", "friendlist", "members");
+//        param.putString("fields", "friendlist", "members");
         graphRequest.setParameters(param);
         graphRequest.executeAsync();
     }
