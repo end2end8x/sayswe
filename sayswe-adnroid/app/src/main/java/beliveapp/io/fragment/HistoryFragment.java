@@ -94,7 +94,6 @@ public class HistoryFragment extends Fragment implements DialogsListAdapter.OnDi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
-
         ButterKnife.bind(this, view);
 
         initAdapter();

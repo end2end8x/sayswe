@@ -1,28 +1,38 @@
 package beliveapp.io.fragment;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Contacts;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.google.android.gms.common.api.Response;
+import com.squareup.picasso.Picasso;
+import com.stfalcon.chatkit.commons.ImageLoader;
+import com.stfalcon.chatkit.commons.models.IMessage;
+import com.stfalcon.chatkit.dialogs.DialogsList;
+import com.stfalcon.chatkit.dialogs.DialogsListAdapter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
+import beliveapp.io.MainActivity;
 import beliveapp.io.R;
+import beliveapp.io.common.data.fixtures.DialogsFixtures;
+import beliveapp.io.common.data.model.Message;
+import beliveapp.io.common.data.model.Phone;
+import beliveapp.io.common.data.model.User;
+import beliveapp.io.features.def.DefaultMessagesActivity;
 import beliveapp.io.listener.OnFragmentInteractionListener;
+import beliveapp.io.utils.AppUtils;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+import beliveapp.io.common.data.model.Dialog;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +42,12 @@ import beliveapp.io.listener.OnFragmentInteractionListener;
  * Use the {@link ContactFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ContactFragment extends Fragment {
+public class ContactFragment extends Fragment implements DialogsListAdapter.OnDialogClickListener<Dialog>,
+        DialogsListAdapter.OnDialogLongClickListener<Dialog> {
+
+    @BindView(R.id.contactList)
+    DialogsList contactList;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -43,6 +58,11 @@ public class ContactFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private ImageLoader imageLoader;
+    private DialogsListAdapter<Dialog> adapter;
+
+    private List<Phone> phoneList = new ArrayList<Phone>();
 
     public ContactFragment() {
         // Required empty public constructor
@@ -79,7 +99,12 @@ public class ContactFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_contact, container, false);
+        View view = inflater.inflate(R.layout.fragment_contact, container, false);
+        ButterKnife.bind(this, view);
+
+        initAdapter();
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -106,50 +131,92 @@ public class ContactFragment extends Fragment {
         mListener = null;
     }
 
-    private void readContact() {
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        GraphRequest graphRequest = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
-            @Override
-            public void onCompleted(JSONObject jsonObject, GraphResponse graphResponse) {
-                try {
-                    JSONArray jsonArrayFriends = jsonObject.getJSONObject("friendlist").getJSONArray("data");
-                    JSONObject friendlistObject = jsonArrayFriends.getJSONObject(0);
-                    String friendListID = friendlistObject.getString("id");
-                    myNewGraphReq(friendListID);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        Bundle param = new Bundle();
-//        param.putString("fields", "friendlist", "members");
-        graphRequest.setParameters(param);
-        graphRequest.executeAsync();
+    private void onNewMessage(String dialogId, IMessage message) {
+        if (!adapter.updateDialogWithMessage(dialogId, message)) {
+            //Dialog with this ID doesn't exist, so you can create new Dialog or reload all dialogs list
+        }
     }
 
-    private void myNewGraphReq(String friendlistId) {
-        final String graphPath = "/"+friendlistId+"/members/";
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        GraphRequest request = new GraphRequest(token, graphPath, null, HttpMethod.GET, new GraphRequest.Callback() {
+    private void initAdapter() {
+
+        phoneList = ((MainActivity) getActivity()).getContact();
+
+        imageLoader = new ImageLoader() {
             @Override
-            public void onCompleted(GraphResponse graphResponse) {
-                JSONObject object = graphResponse.getJSONObject();
-                try {
-                    JSONArray arrayOfUsersInFriendList= object.getJSONArray("data");
-                /* Do something with the user list */
-                /* ex: get first user in list, "name" */
-                    JSONObject user = arrayOfUsersInFriendList.getJSONObject(0);
-                    String usersName = user.getString("name");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            public void loadImage(ImageView imageView, String url) {
+                Picasso.get().load(url).into(imageView);
             }
-        });
-        Bundle param = new Bundle();
-        param.putString("fields", "name");
-        request.setParameters(param);
-        request.executeAsync();
+        };
+
+        adapter = new DialogsListAdapter<>(imageLoader);
+
+        List<Dialog> contacts = new ArrayList<>();
+
+        Date date = new Date();
+
+        for (int i = 0; i < phoneList.size(); i++) {
+            Phone phone = phoneList.get(i);
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, -(i * i));
+            calendar.add(Calendar.MINUTE, -(i * i));
+
+            User user = new User(
+                    phone.getNumber(),
+                    phone.getName(),
+                    DialogsFixtures.getRandomAvatar(),
+                    DialogsFixtures.getRandomBoolean());
+
+            ArrayList<User> users = new ArrayList<User>();
+            users.add(user);
+
+            Message message = new Message(
+                    phone.getNumber(),
+                    user,
+                    phone.getNumber(),
+                    calendar.getTime());
+
+            Dialog dialog = new Dialog(
+                    phone.getNumber(),
+                    phone.getName(),
+                    DialogsFixtures.getRandomAvatar(),
+                    users,
+                    message,
+                    i < 3 ? 3 - i : 0);
+
+            contacts.add(dialog);
+        }
+        adapter.setItems(contacts);
+
+        adapter.setOnDialogClickListener(this);
+        adapter.setOnDialogLongClickListener(this);
+
+        contactList.setAdapter(adapter);
     }
 
+    //for example
+    private void onNewMessage(String dialogId, Message message) {
+        boolean isUpdated = adapter.updateDialogWithMessage(dialogId, message);
+        if (!isUpdated) {
+            //Dialog with this ID doesn't exist, so you can create new Dialog or update all dialogs list
+        }
+    }
+
+    //for example
+    private void onNewDialog(Dialog dialog) {
+        adapter.addItem(dialog);
+    }
+
+    @Override
+    public void onDialogLongClick(Dialog dialog) {
+        AppUtils.showToast(
+                getActivity(),
+                dialog.getDialogName(),
+                false);
+    }
+
+    @Override
+    public void onDialogClick(Dialog dialog) {
+        String id = dialog.getId();
+        DefaultMessagesActivity.open(getActivity());
+    }
 }

@@ -75,35 +75,35 @@ abstract class FixturesData {
         }
     };
 
-    static String getRandomId() {
+    public static String getRandomId() {
         return Long.toString(UUID.randomUUID().getLeastSignificantBits());
     }
 
-    static String getRandomAvatar() {
+    public static String getRandomAvatar() {
         return avatars.get(rnd.nextInt(avatars.size()));
     }
 
-    static String getRandomGroupChatImage() {
+    public static String getRandomGroupChatImage() {
         return groupChatImages.get(rnd.nextInt(groupChatImages.size()));
     }
 
-    static String getRandomGroupChatTitle() {
+    public static String getRandomGroupChatTitle() {
         return groupChatTitles.get(rnd.nextInt(groupChatTitles.size()));
     }
 
-    static String getRandomName() {
+    public static String getRandomName() {
         return names.get(rnd.nextInt(names.size()));
     }
 
-    static String getRandomMessage() {
+    public static String getRandomMessage() {
         return messages.get(rnd.nextInt(messages.size()));
     }
 
-    static String getRandomImage() {
+    public static String getRandomImage() {
         return images.get(rnd.nextInt(images.size()));
     }
 
-    static boolean getRandomBoolean() {
+    public static boolean getRandomBoolean() {
         return rnd.nextBoolean();
     }
 }

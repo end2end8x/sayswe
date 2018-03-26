@@ -84,10 +84,9 @@ public class MessageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_message, container, false);
-
         ButterKnife.bind(this, view);
 
-        String senderId = ((MainActivity) getActivity()).getUid();
+//        String senderId = ((MainActivity) getActivity()).getUser().getUid();
 
         adapter = new MessagesListAdapter<>("", new ImageLoader() {
             @Override

@@ -1,7 +1,7 @@
 {
   // CHAT
   "chats" : {
-    "chatUID" :{
+    "chatUID" : {
        "members" : {
           "userUID" : "sample-userUID",
         },
