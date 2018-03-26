@@ -1,4 +1,32 @@
 {
+  // CHAT
+  "chats" : {
+    "chatUID" :{
+       "members" : {
+          "userUID" : "sample-userUID",
+        },
+       "lastMessageSent" : "sample-messageUID",
+       // ... more properties  
+     }
+  },
+  "chatMessages" : {
+    "chatUID" : {
+      "messageUID" : {
+         "sentBy" : "sample-userUID",
+         "messageDate" : "",
+         "messageTime" : "",
+         "message" : "",
+         // ... more properties  
+       }
+    }
+  },
+  "userChats" : {
+      "userUID" : {
+         "chatUID" : "sample-chatUID",
+      }
+  },
+
+  // Social
   "social" : {
     "comments" : {
       "your_comment_id" : {
