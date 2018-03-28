@@ -37,8 +37,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import beliveapp.io.common.data.model.Phone;
@@ -60,6 +64,15 @@ public class MainActivity extends AppCompatActivity
 
     private static final int PERMISSION_REQUEST_CONTACT = 1;
 
+    protected FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    private DatabaseReference userRef = database.getReference("userChats");
+
+    private DatabaseReference receiveRef = database.getReference("userChats");
+
+
+    private List<Phone> phoneList = new ArrayList<Phone>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,10 +84,38 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mAuth = FirebaseAuth.getInstance();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    // Name, email address, and profile photo Url
+                    String name = user.getDisplayName();
+                    String email = user.getEmail();
+                    Uri photoUrl = user.getPhotoUrl();
+
+                    // Check if user's email is verified
+                    boolean emailVerified = user.isEmailVerified();
+
+                    // The user's ID, unique to the Firebase project. Do NOT use this value to
+                    // authenticate with your backend server, if you have one. Use
+                    // FirebaseUser.getToken() instead.
+                    String uid = user.getUid();
+
+                    HashMap<String, Object> map = new HashMap<String, Object>();
+                    map.put("name", name);
+                    map.put("email", email);
+//                    map.put("photoUrl", photoUrl);
+                    Log.d(TAG, "photoUrl " + photoUrl);
+                    map.put("emailVerified", emailVerified);
+                    map.put("updatedAt", (new Date()).toString());
+
+                    userRef.child(uid).setValue(map);
+                }
 
                 Snackbar.make(view, "Sync Phone Contact", Snackbar.LENGTH_LONG)
                         .setAction(android.R.string.ok, new View.OnClickListener() {
@@ -104,7 +145,6 @@ public class MainActivity extends AppCompatActivity
         TabLayout tbl_pages= (TabLayout) findViewById(R.id.tbl_pages);
         tbl_pages.setupWithViewPager(vp_pages);
 
-        mAuth = FirebaseAuth.getInstance();
 
         askForContactPermission();
     }
@@ -233,6 +273,17 @@ public class MainActivity extends AppCompatActivity
             // authenticate with your backend server, if you have one. Use
             // FirebaseUser.getToken() instead.
             String uid = user.getUid();
+
+            HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("name", name);
+            map.put("email", email);
+//                    map.put("photoUrl", photoUrl);
+            Log.d(TAG, "photoUrl " + photoUrl);
+            map.put("emailVerified", emailVerified);
+            map.put("updatedAt", (new Date()).toString());
+
+            userRef.child(uid).setValue(map);
+
         }
 
     }
@@ -244,18 +295,29 @@ public class MainActivity extends AppCompatActivity
         } else return null;
     }
 
-    public List<Phone> getContact(){
-        List<Phone> phoneList = new ArrayList<Phone>();
-        Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
-        while (cursor.moveToNext()) {
-            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER));
-            phoneList.add(new Phone(name, number));
-            Log.d(TAG, name + " " + number);
-        }
-        cursor.close();
+    public void getContact() {
 
-        Log.d(TAG, "getContact " + phoneList.size());
+        Thread th = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                phoneList = new ArrayList<Phone>();
+                Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
+                while (cursor.moveToNext()) {
+                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                    String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER));
+                    phoneList.add(new Phone(name, number));
+                }
+                cursor.close();
+
+                Log.d(TAG, "getContact " + phoneList.size());
+            }
+        });
+        th.start();
+
+//        return phoneList;
+    }
+
+    public List<Phone> getPhoneList() {
         return phoneList;
     }
 

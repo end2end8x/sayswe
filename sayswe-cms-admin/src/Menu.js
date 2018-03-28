@@ -12,6 +12,8 @@ import { CategoryIcon } from './categories';
 import { ReviewIcon } from './reviews';
 
 const items = [
+    { name: 'userChats', icon: <VisitorIcon /> },
+    { name: 'message', icon: <VisitorIcon /> },
     { name: 'customers', icon: <VisitorIcon /> },
     { name: 'segments', icon: <LabelIcon /> },
     { name: 'commands', icon: <CommandIcon /> },

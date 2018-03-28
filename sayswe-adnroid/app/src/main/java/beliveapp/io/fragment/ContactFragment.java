@@ -4,11 +4,19 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.commons.models.IMessage;
@@ -29,10 +37,12 @@ import beliveapp.io.common.data.model.User;
 import beliveapp.io.features.def.DefaultMessagesActivity;
 import beliveapp.io.listener.OnFragmentInteractionListener;
 import beliveapp.io.utils.AppUtils;
+import beliveapp.io.view.CustomDialogViewHolder;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import beliveapp.io.common.data.model.Dialog;
+import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,6 +57,11 @@ public class ContactFragment extends Fragment implements DialogsListAdapter.OnDi
 
     @BindView(R.id.contactList)
     DialogsList contactList;
+
+    @BindView(R.id.btnSyncContact)
+    Button btnSyncContact;
+
+    private String TAG = "Contact";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -63,6 +78,8 @@ public class ContactFragment extends Fragment implements DialogsListAdapter.OnDi
     private DialogsListAdapter<Dialog> adapter;
 
     private List<Phone> phoneList = new ArrayList<Phone>();
+
+    private DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
 
     public ContactFragment() {
         // Required empty public constructor
@@ -107,6 +124,14 @@ public class ContactFragment extends Fragment implements DialogsListAdapter.OnDi
         return view;
     }
 
+    @OnClick(R.id.btnSyncContact)
+    void submitButton(View view) {
+        if (view.getId() == R.id.btnSyncContact) {
+
+            Toast.makeText(getActivity(), "Sync Contact", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -139,7 +164,7 @@ public class ContactFragment extends Fragment implements DialogsListAdapter.OnDi
 
     private void initAdapter() {
 
-        phoneList = ((MainActivity) getActivity()).getContact();
+        phoneList = ((MainActivity) getActivity()).getPhoneList();
 
         imageLoader = new ImageLoader() {
             @Override
@@ -148,7 +173,9 @@ public class ContactFragment extends Fragment implements DialogsListAdapter.OnDi
             }
         };
 
-        adapter = new DialogsListAdapter<>(imageLoader);
+        adapter = new DialogsListAdapter<>(R.layout.item_custom_dialog_view_holder,
+                CustomDialogViewHolder.class,
+                imageLoader);
 
         List<Dialog> contacts = new ArrayList<>();
 
@@ -191,6 +218,27 @@ public class ContactFragment extends Fragment implements DialogsListAdapter.OnDi
         adapter.setOnDialogLongClickListener(this);
 
         contactList.setAdapter(adapter);
+
+        ref.child("users").child("+84977555115").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    Log.d(TAG, "ContactFragment " + dataSnapshot.getValue().toString());
+                    // use "username" already exists
+                    // Let the user know he needs to pick another username.
+                } else {
+                    Log.d(TAG, "ContactFragment dataSnapshot NOT exists");
+                    // User does not exist. NOW call createUserWithEmailAndPassword
+                    // Your previous code here.
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(TAG, "ContactFragment onCancelled databaseError " + databaseError.toString());
+
+            }
+        });
     }
 
     //for example

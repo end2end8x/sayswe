@@ -20,6 +20,14 @@ import { ProductList, ProductCreate, ProductEdit, ProductIcon } from './products
 import { CategoryList, CategoryEdit, CategoryIcon } from './categories';
 import { ReviewList, ReviewEdit, ReviewIcon } from './reviews';
 
+import {RestClient, AuthClient} from './firebase/index';
+
+import { UserList } from './users/Users';
+import { MessageList } from './message/Message';
+
+
+// import restClient from './restClient';
+import fakeRestServer from './restServer';
 
 var firebaseConfig = {
       apiKey: "AIzaSyCyfP2AdHbdjl0GWwhsmbf_Gv2FXnE4LQs",
@@ -30,13 +38,7 @@ var firebaseConfig = {
       messagingSenderId: "804471267962"
 };
 
-import { RestClient } from 'aor-firebase-client';
-
-import restClient from './restClient';
-import fakeRestServer from './restServer';
-
-const trackedResources = ['posts']
-
+const trackedResources = ['userChats', 'bl_session_message/wRHk0PB4Vd'];
 
 class App extends Component {
     componentWillMount() {
@@ -51,9 +53,10 @@ class App extends Component {
         const restFirebase = RestClient(trackedResources, firebaseConfig);
         
         return (
+
             <Admin
-                title="Posters Galore Admin"
-                restClient={restClient}
+                title={"Says We"}
+                restClient={restFirebase}
                 customReducers={{ theme: themeReducer }}
                 customSagas={sagas}
                 customRoutes={customRoutes}
@@ -63,13 +66,16 @@ class App extends Component {
                 appLayout={Layout}
                 menu={Menu}
                 messages={translations}
-            >
+                >
+                <Resource name="userChats" list={UserList} />
+                <Resource name="message" list={MessageList} />
                 <Resource name="customers" list={VisitorList} edit={VisitorEdit} remove={VisitorDelete} icon={VisitorIcon} />
                 <Resource name="commands" list={CommandList} edit={CommandEdit} remove={Delete} icon={CommandIcon} options={{ label: 'Orders' }}/>
                 <Resource name="products" list={ProductList} create={ProductCreate} edit={ProductEdit} remove={Delete} icon={ProductIcon} />
                 <Resource name="categories" list={CategoryList} edit={CategoryEdit} remove={Delete} icon={CategoryIcon} />
                 <Resource name="reviews" list={ReviewList} edit={ReviewEdit} icon={ReviewIcon} />
             </Admin>
+
         );
     }
 }
