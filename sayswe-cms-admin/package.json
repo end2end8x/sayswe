@@ -41,5 +41,5 @@
         "eject": "react-scripts eject",
         "deploy": "gh-pages -d build"
     },
-    "homepage": "http://belive-fab1f.firebaseapp.com/"
+    "homepage": "https://belive-fab1f.firebaseapp.com/"
 }
